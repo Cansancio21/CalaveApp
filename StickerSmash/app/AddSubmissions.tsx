@@ -9,7 +9,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { useSubmissionContext } from "./SubmissionContext";
+import { useSubmissionContext } from "./(tabs)/SubmissionContext";
 
 export default function AddSubmissionScreen() {
   const { addOrUpdateSubmission } = useSubmissionContext();

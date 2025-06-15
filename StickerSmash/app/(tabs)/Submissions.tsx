@@ -2,13 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
 import {
-    Alert,
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useSubmissionContext } from "./SubmissionContext";
 import { Submission as SubmissionType } from "./_layout";
