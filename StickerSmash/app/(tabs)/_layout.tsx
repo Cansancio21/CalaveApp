@@ -1,64 +1,71 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import React from "react";
 import { SubmissionProvider } from "./SubmissionContext";
-
-export type Grade = {
-  subject: string;
-  grade: string;
-};
 
 export type Submission = {
   id: string;
   image: string | null;
   name: string;
-  grades: Grade[];
+  grades: { subject: string; grade: string }[];
+  yearLevel: string;
+  course: string;
 };
 
-export default function TabsLayout() {
+export default function Layout() {
   return (
     <SubmissionProvider>
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: "#ffd33d",
+          headerStyle: {
+            backgroundColor: "#fff",
+          },
+          headerTintColor: "#000",
+          headerTitleStyle: {
+            fontWeight: "bold",
+          },
         }}
       >
         <Tabs.Screen
           name="index"
           options={{
-            headerTitle: "Calave",
-            tabBarIcon: ({ focused, color }) => (
-              <Ionicons
-                name={focused ? "home-sharp" : "home-outline"}
-                color={color}
-                size={30}
-              />
+            title: "Home",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="home" color={color} size={size} />
             ),
           }}
         />
         <Tabs.Screen
           name="Submissions"
           options={{
-            headerTitle: "Submissions",
-            tabBarIcon: ({ focused, color }) => (
-              <Ionicons
-                name={focused ? "list-sharp" : "list-outline"}
-                color={color}
-                size={30}
-              />
+            title: "Submissions",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="list" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="AddSubmissions"
+          options={{
+            href: null,
+            headerTitle: "Add Submission",
+          }}
+        />
+        <Tabs.Screen
+          name="Profile"
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="person" color={color} size={size} />
             ),
           }}
         />
         <Tabs.Screen
           name="about"
           options={{
-            headerTitle: "About",
-            tabBarIcon: ({ focused, color }) => (
-              <Ionicons
-                name={focused ? "information-circle" : "information-circle-outline"}
-                color={color}
-                size={30}
-              />
+            title: "About",
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="information-circle" color={color} size={size} />
             ),
           }}
         />

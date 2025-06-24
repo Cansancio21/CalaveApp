@@ -1,10 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -19,6 +21,8 @@ export default function Index() {
   const [name, setName] = useState("");
   const [subject, setSubject] = useState("");
   const [grade, setGrade] = useState("");
+  const [yearLevel, setYearLevel] = useState("Select");
+  const [course, setCourse] = useState("Select");
   const router = useRouter();
   const params = useLocalSearchParams();
 
@@ -50,116 +54,158 @@ export default function Index() {
   };
 
   const handleSubmit = () => {
-  if (!name || !subject || !grade) {
-    Alert.alert("Please fill in all fields.");
-    return;
-  }
+    if (!name || !subject || !grade || yearLevel === "Select" || course === "Select") {
+      Alert.alert("Please fill in all fields, including Year Level and Course.");
+      return;
+    }
 
-  addOrUpdateSubmission({ image, name, subject, grade });
-  Alert.alert(
-    "Submission Successful",
-    `Name: ${name}\nSubject: ${subject}\nGrade: ${grade}`,
-    [
-      {
-        text: "OK",
-        onPress: () => {
-          setName("");
-          setSubject("");
-          setGrade("");
-          setImage(null);
-          router.push("/(tabs)/Submissions"); // Updated route
+    addOrUpdateSubmission({ image, name, subject, grade, yearLevel, course });
+    Alert.alert(
+      "Submission Successful",
+      `Name: ${name}\nSubject: ${subject}\nCollege Grade: ${grade}\nYear Level: ${yearLevel}\nCourse: ${course}`,
+      [
+        {
+          text: "OK",
+          onPress: () => {
+            setName("");
+            setSubject("");
+            setGrade("");
+            setYearLevel("Select");
+            setCourse("Select");
+            setImage(null);
+            router.push("/(tabs)/Submissions");
+          },
         },
-      },
-    ]
-  );
-};
+      ]
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.photoContainer} onPress={pickImage}>
-        {image ? (
-          <Image source={{ uri: image }} style={styles.image} />
-        ) : (
-          <View style={styles.placeholder}>
-            <Text style={styles.placeholderText}>Tap to upload photo</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-
-      <Text style={styles.label}>Enter Name:</Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Name"
-          value={name}
-          onChangeText={setName}
-        />
-        <Ionicons
-          name="person-outline"
-          size={24}
-          color="#ffd33d"
-          style={styles.inputIcon}
-        />
+      <View style={styles.fixedPhotoContainer}>
+        <TouchableOpacity style={styles.photoContainer} onPress={pickImage}>
+          {image ? (
+            <Image source={{ uri: image }} style={styles.image} />
+          ) : (
+            <View style={styles.placeholder}>
+              <Text style={styles.placeholderText}>Tap to upload photo</Text>
+            </View>
+          )}
+        </TouchableOpacity>
       </View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.label}>Enter Name:</Text>
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            value={name}
+            onChangeText={setName}
+          />
+          <Ionicons
+            name="person-outline"
+            size={24}
+            color="#ffd33d"
+            style={styles.inputIcon}
+          />
+        </View>
 
-      <Text style={styles.label}>Enter Subject:</Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Subject"
-          value={subject}
-          onChangeText={setSubject}
-        />
-        <Ionicons
-          name="book-outline"
-          size={24}
-          color="#ffd33d"
-          style={styles.inputIcon}
-        />
-      </View>
+        <Text style={styles.label}>Select Year Level:</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={yearLevel}
+            onValueChange={(value: string) => setYearLevel(value)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select Year Level" value="Select" />
+            <Picker.Item label="1st Year" value="1st Year" />
+            <Picker.Item label="2nd Year" value="2nd Year" />
+            <Picker.Item label="3rd Year" value="3rd Year" />
+            <Picker.Item label="4th Year" value="4th Year" />
+          </Picker>
+        </View>
 
-      <Text style={styles.label}>Enter Grade:</Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Grade"
-          value={grade}
-          onChangeText={setGrade}
-          keyboardType="numeric"
-        />
-        <Ionicons
-          name="school-outline"
-          size={24}
-          color="#ffd33d"
-          style={styles.inputIcon}
-        />
-      </View>
+        <Text style={styles.label}>Select Course:</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={course}
+            onValueChange={(value: string) => setCourse(value)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select Course" value="Select" />
+            <Picker.Item label="BS Criminology" value="BS Criminology" />
+            <Picker.Item label="BS Information Technology" value="BS Information Technology" />
+            <Picker.Item label="BS Hospitality Management" value="BS Hospitality Management" />
+            <Picker.Item label="BS Tourism Management" value="BS Tourism Management" />
+            <Picker.Item label="BS Education" value="BS Education" />
+            <Picker.Item label="BS Accounting Management" value="BS Accounting Management" />
+          </Picker>
+        </View>
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Submit</Text>
-      </TouchableOpacity>
+        <Text style={styles.label}>Enter Subject:</Text>
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="Subject"
+            value={subject}
+            onChangeText={setSubject}
+          />
+          <Ionicons
+            name="book-outline"
+            size={24}
+            color="#ffd33d"
+            style={styles.inputIcon}
+          />
+        </View>
+
+        <Text style={styles.label}>Enter College Grade:</Text>
+        <View style={styles.inputWrapper}>
+          <TextInput
+            style={styles.input}
+            placeholder="College Grade (e.g., 1.0-5.0)"
+            value={grade}
+            onChangeText={setGrade}
+            keyboardType="numeric"
+          />
+          <Ionicons
+            name="school-outline"
+            size={24}
+            color="#ffd33d"
+            style={styles.inputIcon}
+          />
+        </View>
+
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>Submit</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
     flex: 1,
     backgroundColor: "#fff",
   },
+  fixedPhotoContainer: {
+    alignSelf: "center",
+    marginTop: 20,
+    marginBottom: 20,
+    zIndex: 1,
+  },
   photoContainer: {
     alignSelf: "center",
-    marginBottom: 20,
   },
   image: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
   placeholder: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: "#eee",
     alignItems: "center",
     justifyContent: "center",
@@ -167,6 +213,12 @@ const styles = StyleSheet.create({
   placeholderText: {
     color: "black",
     textAlign: "center",
+    fontSize: 12,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingTop: 10,
+    paddingBottom: 40,
   },
   label: {
     fontSize: 18,
@@ -190,6 +242,15 @@ const styles = StyleSheet.create({
   },
   inputIcon: {
     marginLeft: 10,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 16,
+  },
+  picker: {
+    height: 50,
   },
   submitButton: {
     backgroundColor: "#ffd33d",
