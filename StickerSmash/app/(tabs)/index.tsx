@@ -23,6 +23,11 @@ export default function Index() {
   const [grade, setGrade] = useState("");
   const [yearLevel, setYearLevel] = useState("Select");
   const [course, setCourse] = useState("Select");
+
+  // 🔴 Error States
+  const [nameError, setNameError] = useState("");
+  const [subjectError, setSubjectError] = useState("");
+
   const router = useRouter();
   const params = useLocalSearchParams();
 
@@ -54,12 +59,42 @@ export default function Index() {
   };
 
   const handleSubmit = () => {
-    if (!name || !subject || !grade || yearLevel === "Select" || course === "Select") {
-      Alert.alert("Please fill in all fields, including Year Level and Course.");
-      return;
+    let hasError = false;
+
+    // Reset error messages
+    setNameError("");
+    setSubjectError("");
+
+    // Validate name
+    if (!name) {
+      setNameError("Name is required.");
+      hasError = true;
+    } else if (/\d/.test(name)) {
+      setNameError("Name must not contain numbers.");
+      hasError = true;
     }
 
+    // Validate subject
+    if (!subject) {
+      setSubjectError("Subject is required.");
+      hasError = true;
+    } else if (!/^[A-Z]/.test(subject)) {
+      setSubjectError("Subject must start with a capital letter.");
+      hasError = true;
+    } else if (/\d/.test(subject)) {
+      setSubjectError("Subject must not contain numbers.");
+      hasError = true;
+    }
+
+    if (!grade || yearLevel === "Select" || course === "Select") {
+      Alert.alert("Please fill in all fields, including Year Level and Course.");
+      hasError = true;
+    }
+
+    if (hasError) return;
+
     addOrUpdateSubmission({ image, name, subject, grade, yearLevel, course });
+
     Alert.alert(
       "Submission Successful",
       `Name: ${name}\nSubject: ${subject}\nCollege Grade: ${grade}\nYear Level: ${yearLevel}\nCourse: ${course}`,
@@ -109,6 +144,7 @@ export default function Index() {
             style={styles.inputIcon}
           />
         </View>
+        <Text style={styles.errorText}>{nameError}</Text>
 
         <Text style={styles.label}>Select Year Level:</Text>
         <View style={styles.pickerContainer}>
@@ -157,6 +193,7 @@ export default function Index() {
             style={styles.inputIcon}
           />
         </View>
+        <Text style={styles.errorText}>{subjectError}</Text>
 
         <Text style={styles.label}>Enter College Grade:</Text>
         <View style={styles.inputWrapper}>
@@ -233,7 +270,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 5,
     paddingHorizontal: 10,
-    marginBottom: 16,
+    marginBottom: 4,
   },
   input: {
     flex: 1,
@@ -251,6 +288,12 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 50,
+  },
+  errorText: {
+    color: "red",
+    fontSize: 13,
+    marginBottom: 10,
+    minHeight: 18, // reserve height to avoid layout shift
   },
   submitButton: {
     backgroundColor: "#ffd33d",
