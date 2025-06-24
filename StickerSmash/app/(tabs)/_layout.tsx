@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { SubmissionProvider } from "./SubmissionContext";
 
+
 export type Submission = {
   id: string;
   image: string | null;

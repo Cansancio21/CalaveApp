@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
 import { LogBox } from "react-native";
+import React from "react"; 
 
 LogBox.ignoreAllLogs(true);
 

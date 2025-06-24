@@ -3,12 +3,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  Animated,
+  Platform
 } from "react-native";
 
 export default function Register() {
@@ -18,233 +20,328 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [contactNumber, setContactNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  
+  const buttonScale = new Animated.Value(1);
+
+  const animatePressIn = () => {
+    Animated.spring(buttonScale, {
+      toValue: 0.96,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const animatePressOut = () => {
+    Animated.spring(buttonScale, {
+      toValue: 1,
+      friction: 5,
+      tension: 50,
+      useNativeDriver: true,
+    }).start();
+  };
 
   const handleRegister = async () => {
-    if (!firstName || !lastName || !username || !email || !contactNumber || !password) {
-      Alert.alert("Error", "Please fill in all fields.");
-      return;
-    }
-
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Alert.alert("Error", "Please enter a valid email address.");
-      return;
-    }
-
-    // Basic contact number validation (digits only, 7-15 characters)
-    const contactRegex = /^\d{7,15}$/;
-    if (!contactRegex.test(contactNumber)) {
-      Alert.alert("Error", "Please enter a valid contact number (7-15 digits).");
+    if (!firstName || !lastName || !username || !email || !password) {
+      Alert.alert("Error", "Please fill in all required fields.");
       return;
     }
 
     try {
-      // Check if username already exists
       const existingUsers = await AsyncStorage.getItem("users");
       const users = existingUsers ? JSON.parse(existingUsers) : [];
-      if (users.some((user: any) => user.username === username)) {
-        Alert.alert("Error", "Username already exists.");
+      
+      // Check if username already exists
+      if (users.some((u: any) => u.username === username)) {
+        Alert.alert("Error", "Username already exists");
         return;
       }
 
-      // Store user data
-      const newUser = { firstName, lastName, username, email, contactNumber, password };
+      // Check if email already exists
+      if (users.some((u: any) => u.email === email)) {
+        Alert.alert("Error", "Email already registered");
+        return;
+      }
+
+      const newUser = {
+        firstName,
+        lastName,
+        username,
+        email,
+        contactNumber,
+        password
+      };
+
       users.push(newUser);
       await AsyncStorage.setItem("users", JSON.stringify(users));
-      console.log("Registered user:", newUser); // Debug: Log registered user
-
-      Alert.alert("Success", "Registration successful!", [
-        {
-          text: "OK",
-          onPress: () => {
-            setFirstName("");
-            setLastName("");
-            setUsername("");
-            setEmail("");
-            setContactNumber("");
-            setPassword("");
-            router.push("/login");
-          },
-        },
+      await AsyncStorage.setItem("authToken", username);
+      
+      Alert.alert("Success", "Account created successfully!", [
+        { text: "Continue", onPress: () => router.push("/(tabs)") }
       ]);
     } catch (error) {
-      Alert.alert("Error", "Failed to register. Please try again.");
-      console.error("Register error:", error);
+      Alert.alert("Error", "Registration failed. Please try again.");
     }
   };
 
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+    <View style={styles.background}>
+      <View style={styles.container}>
+        <View style={styles.glassContainer}>
+          <View style={styles.header}>
+            <Text style={styles.appName}>CalaveApp</Text>
+            <View style={styles.logoUnderline} />
+            <Text style={styles.subtitle}>Create your account</Text>
+          </View>
 
-      <Text style={styles.label}>First Name:</Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter first name"
-          value={firstName}
-          onChangeText={setFirstName}
-          autoCapitalize="words"
-        />
-        <Ionicons
-          name="person-outline"
-          size={24}
-          color="#ffd33d"
-          style={styles.inputIcon}
-        />
+          <View style={styles.formContainer}>
+            {/* First Name */}
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="person-outline"
+                size={20}
+                color="#FFD700"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="First Name"
+                placeholderTextColor="#555"
+                value={firstName}
+                onChangeText={setFirstName}
+                autoCapitalize="words"
+              />
+            </View>
+
+            {/* Last Name */}
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="person-outline"
+                size={20}
+                color="#FFD700"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Last Name"
+                placeholderTextColor="#555"
+                value={lastName}
+                onChangeText={setLastName}
+                autoCapitalize="words"
+              />
+            </View>
+
+            {/* Username */}
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="person-circle-outline"
+                size={20}
+                color="#FFD700"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Username"
+                placeholderTextColor="#555"
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+              />
+            </View>
+
+            {/* Email */}
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="mail-outline"
+                size={20}
+                color="#FFD700"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                placeholderTextColor="#555"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+
+            {/* Contact Number */}
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="call-outline"
+                size={20}
+                color="#FFD700"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Contact Number"
+                placeholderTextColor="#555"
+                value={contactNumber}
+                onChangeText={setContactNumber}
+                keyboardType="phone-pad"
+              />
+            </View>
+
+            {/* Password */}
+            <View style={styles.inputWrapper}>
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color="#FFD700"
+                style={styles.inputIcon}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                placeholderTextColor="#555"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+              />
+              <TouchableOpacity onPress={toggleShowPassword}>
+                <Ionicons
+                  name={showPassword ? "eye-off-outline" : "eye-outline"}
+                  size={20}
+                  color="#FFD700"
+                  style={styles.passwordIcon}
+                />
+              </TouchableOpacity>
+            </View>
+
+            <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+              <TouchableOpacity 
+                style={styles.registerButton} 
+                onPress={handleRegister}
+                onPressIn={animatePressIn}
+                onPressOut={animatePressOut}
+                activeOpacity={0.9}
+              >
+                <Text style={styles.registerButtonText}>Register</Text>
+              </TouchableOpacity>
+            </Animated.View>
+
+            <TouchableOpacity 
+              style={styles.loginPrompt}
+              onPress={() => router.push("/login")}
+            >
+              <Text style={styles.loginText}>
+                Already have an account? <Text style={styles.loginLink}>Sign in</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-
-      <Text style={styles.label}>Last Name:</Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter last name"
-          value={lastName}
-          onChangeText={setLastName}
-          autoCapitalize="words"
-        />
-        <Ionicons
-          name="person-outline"
-          size={24}
-          color="#ffd33d"
-          style={styles.inputIcon}
-        />
-      </View>
-
-      <Text style={styles.label}>Username:</Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter username"
-          value={username}
-          onChangeText={setUsername}
-          autoCapitalize="none"
-        />
-        <Ionicons
-          name="person-circle-outline"
-          size={24}
-          color="#ffd33d"
-          style={styles.inputIcon}
-        />
-      </View>
-
-      <Text style={styles.label}>Email:</Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter email"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <Ionicons
-          name="mail-outline"
-          size={24}
-          color="#ffd33d"
-          style={styles.inputIcon}
-        />
-      </View>
-
-      <Text style={styles.label}>Contact Number:</Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter contact number"
-          value={contactNumber}
-          onChangeText={setContactNumber}
-          keyboardType="phone-pad"
-        />
-        <Ionicons
-          name="call-outline"
-          size={24}
-          color="#ffd33d"
-          style={styles.inputIcon}
-        />
-      </View>
-
-      <Text style={styles.label}>Password:</Text>
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoCapitalize="none"
-        />
-        <Ionicons
-          name="lock-closed-outline"
-          size={24}
-          color="#ffd33d"
-          style={styles.inputIcon}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-        <Text style={styles.registerButtonText}>Register</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => router.push("/login")}>
-        <Text style={styles.loginLink}>Already have an account? Login</Text>
-      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
+  background: {
     flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "center",
+    backgroundColor: '#000',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    textAlign: "center",
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 28,
+  },
+  glassContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    borderRadius: 16,
+    padding: 24,
+    ...Platform.select({
+      ios: {
+        backdropFilter: 'blur(10px)',
+      },
+      android: {
+        elevation: 10,
+      },
+    }),
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  header: {
     marginBottom: 30,
+    alignItems: 'center',
   },
-  label: {
-    fontSize: 18,
-    marginBottom: 6,
-    fontWeight: "bold",
+  appName: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#000',
+    letterSpacing: 0.5,
+  },
+  logoUnderline: {
+    width: 50,
+    height: 4,
+    backgroundColor: '#FFD700',
+    marginVertical: 8,
+    borderRadius: 2,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#000',
+    letterSpacing: 0.5,
+  },
+  formContainer: {
+    borderRadius: 16,
+    padding: 16,
   },
   inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderColor: 'rgba(0, 0, 0, 0.2)',
+    paddingVertical: 12,
+    marginBottom: 20,
+  },
+  inputIcon: {
+    marginRight: 12,
+  },
+  passwordIcon: {
+    marginLeft: 12,
   },
   input: {
     flex: 1,
     fontSize: 16,
-    paddingVertical: 10,
-  },
-  inputIcon: {
-    marginLeft: 10,
+    color: '#000',
+    paddingVertical: 4,
   },
   registerButton: {
-    backgroundColor: "#ffd33d",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 20,
+    backgroundColor: '#FFD700',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 24,
   },
   registerButtonText: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
+    fontWeight: '600',
+    color: '#000',
+    letterSpacing: 0.5,
+  },
+  loginPrompt: {
+    alignSelf: 'center',
+  },
+  loginText: {
+    color: '#555',
+    fontSize: 14,
   },
   loginLink: {
-    fontSize: 16,
-    color: "#ffd33d",
-    textAlign: "center",
-    marginTop: 20,
+    color: '#FFD700',
+    fontWeight: '600',
   },
 });

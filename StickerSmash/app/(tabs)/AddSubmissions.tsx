@@ -66,8 +66,8 @@ export default function AddSubmissionScreen() {
 
     if (submissions.length > 0 && !exists) {
       Alert.alert(
-        "User Not Found",
-        "This user does not exist in submissions. Please enter the exact name as registered."
+        "Students Not Found",
+        "This Students does not exist in submissions. Please enter the exact name as registered."
       );
       return;
     }
