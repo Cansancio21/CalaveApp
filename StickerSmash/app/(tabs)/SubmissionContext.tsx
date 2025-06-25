@@ -7,10 +7,11 @@ interface SubmissionContextType {
     name: string;
     subject: string;
     grade: string;
-    image?: string | null; // Made optional
-    yearLevel?: string; // Made optional
-    course?: string; // Made optional
+    image?: string | null;
+    yearLevel?: string;
+    course?: string;
   }) => void;
+  updateSubmission: (submission: Submission) => void;
   deleteSubmission: (id: string) => void;
 }
 
@@ -21,6 +22,7 @@ export const SubmissionProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
 
+  // Original function that works with your index.tsx
   const addOrUpdateSubmission = ({
     name,
     subject,
@@ -65,13 +67,22 @@ export const SubmissionProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
 
+  // New function for updating complete submissions (used in Submission.tsx)
+  const updateSubmission = (submission: Submission) => {
+    setSubmissions((prev) => {
+      return prev.map((s) => 
+        s.id === submission.id ? submission : s
+      );
+    });
+  };
+
   const deleteSubmission = (id: string) => {
     setSubmissions((prev) => prev.filter((s) => s.id !== id));
   };
 
   return (
     <SubmissionContext.Provider
-      value={{ submissions, addOrUpdateSubmission, deleteSubmission }}
+      value={{ submissions, addOrUpdateSubmission, updateSubmission, deleteSubmission }}
     >
       {children}
     </SubmissionContext.Provider>

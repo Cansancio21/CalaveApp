@@ -67,7 +67,7 @@ export default function AddSubmissionScreen() {
     if (submissions.length > 0 && !exists) {
       Alert.alert(
         "Students Not Found",
-        "This Students does not exist in submissions. Please enter the exact name as registered."
+        "This student does not exist in submissions. Please enter the exact name as registered."
       );
       return;
     }
@@ -92,119 +92,136 @@ export default function AddSubmissionScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* === Name === */}
-        <Text style={styles.label}>Enter Name:</Text>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Name"
-            value={name}
-            onChangeText={setName}
-          />
-          <Ionicons
-            name="person-outline"
-            size={24}
-            color="#ffd33d"
-            style={styles.inputIcon}
-          />
-        </View>
-        <Text style={styles.errorText}>{nameError}</Text>
+    <View style={styles.background}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.glassContainer}>
+          {/* === Name === */}
+          <Text style={styles.label}>Enter Name:</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons
+              name="person-outline"
+              size={24}
+              color="#FFD700"
+              style={styles.inputIcon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Name"
+              placeholderTextColor="#888"
+              value={name}
+              onChangeText={setName}
+            />
+          </View>
+          <Text style={styles.errorText}>{nameError}</Text>
 
-        {/* === Subject === */}
-        <Text style={styles.label}>Enter Subject:</Text>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Subject"
-            value={subject}
-            onChangeText={setSubject}
-          />
-          <Ionicons
-            name="book-outline"
-            size={24}
-            color="#ffd33d"
-            style={styles.inputIcon}
-          />
-        </View>
-        <Text style={styles.errorText}>{subjectError}</Text>
+          {/* === Subject === */}
+          <Text style={styles.label}>Enter Subject:</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons
+              name="book-outline"
+              size={24}
+              color="#FFD700"
+              style={styles.inputIcon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Subject"
+              placeholderTextColor="#888"
+              value={subject}
+              onChangeText={setSubject}
+            />
+          </View>
+          <Text style={styles.errorText}>{subjectError}</Text>
 
-        {/* === College Grade === */}
-        <Text style={styles.label}>Enter College Grade:</Text>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="College Grade (e.g., 1.0 - 5.0)"
-            value={collegeGrade}
-            onChangeText={setCollegeGrade}
-            keyboardType="numeric"
-          />
-          <Ionicons
-            name="school-outline"
-            size={24}
-            color="#ffd33d"
-            style={styles.inputIcon}
-          />
-        </View>
-        <Text style={styles.errorText}>{collegeGradeError}</Text>
+          {/* === College Grade === */}
+          <Text style={styles.label}>Enter College Grade:</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons
+              name="school-outline"
+              size={24}
+              color="#FFD700"
+              style={styles.inputIcon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="College Grade (1.0-5.0)"
+              placeholderTextColor="#888"
+              value={collegeGrade}
+              onChangeText={setCollegeGrade}
+              keyboardType="numeric"
+            />
+          </View>
+          <Text style={styles.errorText}>{collegeGradeError}</Text>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Submit</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+            <Text style={styles.submitButtonText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#000',
   },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  glassContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 25,
+    margin: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
   },
   label: {
-    fontSize: 18,
-    marginBottom: 6,
-    marginTop: 16,
-    fontWeight: "bold",
+    fontSize: 16,
+    color: '#000',
+    fontWeight: '600',
+    marginBottom: 8,
+    marginTop: 12,
   },
   inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderColor: '#E0E0E0',
+    paddingVertical: 8,
+    marginBottom: 6,
   },
   input: {
     flex: 1,
     fontSize: 16,
-    paddingVertical: 10,
+    color: '#000',
+    paddingVertical: 8,
   },
   inputIcon: {
-    marginLeft: 10,
+    marginRight: 10,
   },
   errorText: {
-    color: "red",
-    fontSize: 13,
-    marginBottom: 10,
-    minHeight: 18, // Keeps space even when empty
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 12,
+    marginTop: -6,
   },
   submitButton: {
-    backgroundColor: "#ffd33d",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 30,
+    backgroundColor: '#FFD700',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 25,
   },
   submitButtonText: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
+    fontWeight: '600',
+    color: '#000',
   },
 });

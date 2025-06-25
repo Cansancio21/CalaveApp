@@ -3,12 +3,28 @@ import { StyleSheet, Text, View } from 'react-native';
 export default function AboutScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>About This App</Text>
-      <Text style={styles.description}>
-        This app is designed to help students and teachers easily input grades for different subjects
-        and automatically calculate the average. It provides a simple, clean interface to manage scores,
-        keep track of academic performance, and improve grade tracking.
-      </Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>CalaveApp</Text>
+        <Text style={styles.tagline}>Grades made simple</Text>
+      </View>
+
+      {/* Content */}
+      <View style={styles.content}>
+        <Text style={styles.description}>
+          A clean tool for students and teachers to track grades and calculate averages without distractions.
+        </Text>
+
+        {/* Key Features */}
+        <View style={styles.features}>
+          <Text style={styles.feature}>• Automatic calculations</Text>
+          <Text style={styles.feature}>• Clean interface</Text>
+          <Text style={styles.feature}>• No unnecessary features</Text>
+        </View>
+      </View>
+
+      {/* Footer */}
+      <Text style={styles.footer}>Focus on what matters</Text>
     </View>
   );
 }
@@ -16,21 +32,47 @@ export default function AboutScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#25292e',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#121212',
     padding: 20,
   },
+  header: {
+    alignItems: 'center',
+    marginBottom: 30,
+    marginTop: 20,
+  },
   title: {
-    fontSize: 24,
-    color: '#ffd33d',
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontSize: 28,
+    color: '#fff',
+    fontWeight: '700',
+  },
+  tagline: {
+    fontSize: 16,
+    color: '#888',
+    marginTop: 5,
+  },
+  content: {
+    flex: 1,
   },
   description: {
-    color: '#fff',
+    color: '#ccc',
     fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 25,
+  },
+  features: {
+    backgroundColor: '#1E1E1E',
+    borderRadius: 8,
+    padding: 16,
+  },
+  feature: {
+    color: '#fff',
+    fontSize: 15,
+    marginVertical: 6,
+  },
+  footer: {
+    color: '#666',
     textAlign: 'center',
-    lineHeight: 22,
+    marginBottom: 20,
+    fontSize: 14,
   },
 });

@@ -1,15 +1,16 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface User {
@@ -32,36 +33,22 @@ export default function Profile() {
       try {
         setIsLoading(true);
         const token = await AsyncStorage.getItem("authToken");
-        console.log("Auth Token:", token); // Debug: Log token
-
         if (!token) {
-          Alert.alert("Error", "Not logged in. Please log in again.");
           router.push("/login");
           return;
         }
 
         const existingUsers = await AsyncStorage.getItem("users");
-        console.log("Users Data:", existingUsers); // Debug: Log users
-
         if (!existingUsers) {
-          Alert.alert("Error", "No user data found. Please register.");
           router.push("/register");
           return;
         }
 
         const users = JSON.parse(existingUsers);
         const currentUser = users.find((u: User) => u.username === token);
-
-        if (currentUser) {
-          setUser(currentUser);
-        } else {
-          Alert.alert("Error", "User not found. Please log in again.");
-          router.push("/login");
-        }
+        setUser(currentUser || null);
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        Alert.alert("Error", "Failed to load profile. Please try again.");
-        router.push("/login");
+        Alert.alert("Error", "Failed to load profile");
       } finally {
         setIsLoading(false);
       }
@@ -73,10 +60,7 @@ export default function Profile() {
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(
-        "Permission denied",
-        "We need access to your gallery to upload photos."
-      );
+      Alert.alert("Permission denied", "We need access to your gallery.");
       return;
     }
 
@@ -96,10 +80,7 @@ export default function Profile() {
         );
         await AsyncStorage.setItem("users", JSON.stringify(updatedUsers));
         setUser(updatedUser);
-        console.log("Updated user with profile image:", updatedUser); // Debug
-        Alert.alert("Success", "Profile image updated!");
       } catch (error) {
-        console.error("Error saving profile image:", error);
         Alert.alert("Error", "Failed to save profile image.");
       }
     }
@@ -107,7 +88,7 @@ export default function Profile() {
 
   if (isLoading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.background}>
         <Text style={styles.loadingText}>Loading Profile...</Text>
       </View>
     );
@@ -115,144 +96,134 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <View style={styles.container}>
+      <View style={styles.background}>
         <Text style={styles.loadingText}>No Profile Data</Text>
-        <TouchableOpacity
-          style={styles.loginButton}
-          onPress={() => router.push("/login")}
-        >
-          <Text style={styles.loginButtonText}>Go to Login</Text>
+        <TouchableOpacity style={styles.button} onPress={() => router.push("/login")}>
+          <Text style={styles.buttonText}>Go to Login</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.photoContainer} onPress={pickImage}>
-        {user.profileImage ? (
-          <Image source={{ uri: user.profileImage }} style={styles.image} />
-        ) : (
-          <View style={styles.placeholder}>
-            <Text style={styles.placeholderText}>Tap to upload photo</Text>
-          </View>
-        )}
-      </TouchableOpacity>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>First Name:</Text>
-          <Text style={styles.value}>{user.firstName}</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Last Name:</Text>
-          <Text style={styles.value}>{user.lastName}</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Username:</Text>
-          <Text style={styles.value}>{user.username}</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Email:</Text>
-          <Text style={styles.value}>{user.email}</Text>
-        </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Contact Number:</Text>
-          <Text style={styles.value}>{user.contactNumber}</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={async () => {
-            try {
+    <View style={styles.background}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.glassContainer}>
+          <TouchableOpacity style={styles.photoContainer} onPress={pickImage}>
+            {user.profileImage ? (
+              <Image source={{ uri: user.profileImage }} style={styles.image} />
+            ) : (
+              <View style={styles.placeholder}>
+                <Ionicons name="camera" size={32} color="#555" />
+                <Text style={styles.placeholderText}>Tap to upload photo</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+
+          {["firstName", "lastName", "username", "email", "contactNumber"].map(
+            (key) => (
+              <View key={key} style={styles.infoContainer}>
+                <Text style={styles.label}>
+                  {key.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase())}:
+                </Text>
+                <Text style={styles.value}>{user[key as keyof User] || "Not provided"}</Text>
+              </View>
+            )
+          )}
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={async () => {
               await AsyncStorage.removeItem("authToken");
               router.push("/login");
-            } catch (error) {
-              console.error("Logout error:", error);
-              Alert.alert("Error", "Failed to log out.");
-            }
-          }}
-        >
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
+            }}
+          >
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#000',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  glassContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 25,
+    margin: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  loadingText: {
+    color: '#FFF',
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 20,
   },
   photoContainer: {
-    alignSelf: "center",
-    marginTop: 20, // Reduced from 80 since no back button
-    marginBottom: 20,
+    alignSelf: 'center',
+    marginBottom: 25,
   },
   image: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: '#FFD700',
   },
   placeholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: "#eee",
-    alignItems: "center",
-    justifyContent: "center",
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#F5F5F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   placeholderText: {
-    color: "black",
-    textAlign: "center",
-    fontSize: 14,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
+    color: '#555',
+    fontSize: 12,
+    marginTop: 8,
   },
   infoContainer: {
-    marginBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+    marginBottom: 20,
     paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
   label: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    marginBottom: 4,
   },
   value: {
     fontSize: 16,
-    color: "#333",
-    marginTop: 4,
+    color: '#333',
   },
-  loadingText: {
+  button: {
+    backgroundColor: '#FFD700',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 25,
+  },
+  buttonText: {
     fontSize: 18,
-    textAlign: "center",
-    marginTop: 20,
-  },
-  loginButton: {
-    backgroundColor: "#ffd33d",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  loginButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  logoutButton: {
-    backgroundColor: "#ffd33d",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 30,
-  },
-  logoutButtonText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#000",
+    fontWeight: '600',
+    color: '#000',
   },
 });

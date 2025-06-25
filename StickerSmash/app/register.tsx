@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   glassContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 24,
     ...Platform.select({

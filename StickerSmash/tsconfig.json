@@ -6,13 +6,14 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "types": []  // ✅ prevent auto-including node types
   },
   "include": [
-    "*/.ts",
-    "*/.tsx",
+    "**/*.ts",
+    "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
-    "app/(tabs)/AddSubmissions.tsx"  // ✅ you can add this
+    "app/(tabs)/AddSubmissions.tsx"
   ]
 }
