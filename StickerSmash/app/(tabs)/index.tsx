@@ -75,9 +75,6 @@ export default function Index() {
     } else if (!/^[A-Z]/.test(subject)) {
       setSubjectError("Subject must start with a capital letter.");
       hasError = true;
-    } else if (/\d/.test(subject)) {
-      setSubjectError("Subject must not contain numbers.");
-      hasError = true;
     }
 
     if (!grade || yearLevel === "Select" || course === "Select") {

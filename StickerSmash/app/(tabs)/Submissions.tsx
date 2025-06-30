@@ -5,10 +5,8 @@ import {
   Alert,
   FlatList,
   Image,
-  Modal,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -16,55 +14,7 @@ import { useSubmissionContext } from "./SubmissionContext";
 import { Submission as SubmissionType } from "./_layout";
 
 export default function Submission() {
-  const { submissions, deleteSubmission, updateSubmission } = useSubmissionContext();
-
-  const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editItem, setEditItem] = useState<SubmissionType | null>(null);
-  const [editName, setEditName] = useState("");
-  const [editYear, setEditYear] = useState("");
-  const [editCourse, setEditCourse] = useState("");
-  const [editGrades, setEditGrades] = useState<{subject: string, grade: string}[]>([]);
-  const [newSubject, setNewSubject] = useState("");
-  const [newGrade, setNewGrade] = useState("");
-
-  const openEditModal = (item: SubmissionType) => {
-    setEditItem(item);
-    setEditName(item.name);
-    setEditYear(item.yearLevel);
-    setEditCourse(item.course);
-    setEditGrades([...item.grades]);
-    setEditModalVisible(true);
-  };
-
-  const handleEditSubmit = () => {
-    if (!editItem) return;
-
-    const updated: SubmissionType = {
-      ...editItem,
-      name: editName,
-      yearLevel: editYear,
-      course: editCourse,
-      grades: editGrades,
-    };
-
-    updateSubmission(updated);
-    setEditModalVisible(false);
-    Alert.alert("Updated", "Submission updated successfully.");
-  };
-
-  const addGrade = () => {
-    if (newSubject && newGrade) {
-      setEditGrades([...editGrades, {subject: newSubject, grade: newGrade}]);
-      setNewSubject("");
-      setNewGrade("");
-    }
-  };
-
-  const removeGrade = (index: number) => {
-    const updatedGrades = [...editGrades];
-    updatedGrades.splice(index, 1);
-    setEditGrades(updatedGrades);
-  };
+  const { submissions, deleteSubmission } = useSubmissionContext();
 
   const calculateAverageGrade = (grades: { subject: string; grade: string }[]): string => {
     const validGrades = grades
@@ -93,9 +43,7 @@ export default function Submission() {
           <Text style={styles.info}>
             {item.grades.length} {item.grades.length === 1 ? "grade" : "grades"}
           </Text>
-          <Text style={styles.info}>
-            {calculateAverageGrade(item.grades)}
-          </Text>
+          
         </View>
       </View>
 
@@ -114,25 +62,6 @@ export default function Submission() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: "#007AFF" }]}
-          onPress={() => openEditModal(item)}
-        >
-          <Ionicons name="create-outline" size={18} color="#fff" />
-          <Text style={styles.buttonText}>Edit</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: "#FF9500" }]}
-          onPress={() => {
-            const avg = calculateAverageGrade(item.grades);
-            Alert.alert(`Average for ${item.name}`, avg);
-          }}
-        >
-          <Ionicons name="calculator-outline" size={18} color="#fff" />
-          <Text style={styles.buttonText}>Calc</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: "#FF3B30" }]}
           onPress={() => {
             Alert.alert("Confirm Delete", `Delete ${item.name}?`, [
@@ -147,6 +76,17 @@ export default function Submission() {
         >
           <Ionicons name="trash-outline" size={18} color="#fff" />
           <Text style={styles.buttonText}>Delete</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: "#FF9500" }]}
+          onPress={() => {
+            const avg = calculateAverageGrade(item.grades);
+            Alert.alert(`Average for ${item.name}`, avg);
+          }}
+        >
+          <Ionicons name="calculator-outline" size={18} color="#fff" />
+          <Text style={styles.buttonText}>Calc</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -179,84 +119,9 @@ export default function Submission() {
           </Link>
         </>
       )}
-
-      <Modal visible={editModalVisible} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Edit Submission</Text>
-
-            <TextInput
-              style={styles.modalInput}
-              value={editName}
-              onChangeText={setEditName}
-              placeholder="Name"
-            />
-            <TextInput
-              style={styles.modalInput}
-              value={editYear}
-              onChangeText={setEditYear}
-              placeholder="Year Level"
-            />
-            <TextInput
-              style={styles.modalInput}
-              value={editCourse}
-              onChangeText={setEditCourse}
-              placeholder="Course"
-            />
-
-            <Text style={styles.sectionTitle}>Grades</Text>
-            {editGrades.map((grade, index) => (
-              <View key={index} style={styles.gradeItem}>
-                <Text style={styles.gradeText}>{grade.subject}: {grade.grade}</Text>
-                <TouchableOpacity onPress={() => removeGrade(index)}>
-                  <Ionicons name="trash-outline" size={20} color="#FF3B30" />
-                </TouchableOpacity>
-              </View>
-            ))}
-
-            <View style={styles.addGradeContainer}>
-              <TextInput
-                style={[styles.modalInput, {flex: 1}]}
-                value={newSubject}
-                onChangeText={setNewSubject}
-                placeholder="Subject"
-              />
-              <TextInput
-                style={[styles.modalInput, {width: 80}]}
-                value={newGrade}
-                onChangeText={setNewGrade}
-                placeholder="Grade"
-                keyboardType="numeric"
-              />
-              <TouchableOpacity
-                style={styles.addGradeButton}
-                onPress={addGrade}
-              >
-                <Ionicons name="add" size={20} color="#fff" />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.modalButtonRow}>
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: "#007AFF" }]}
-                onPress={handleEditSubmit}
-              >
-                <Text style={styles.modalButtonText}>Update</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: "#ccc" }]}
-                onPress={() => setEditModalVisible(false)}
-              >
-                <Text style={[styles.modalButtonText, { color: "#333" }]}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -312,10 +177,8 @@ const styles = StyleSheet.create({
   },
   buttonRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",  // Changed to space-evenly for even distribution
     marginTop: 12,
-    flexWrap: "wrap",
-    gap: 8,
   },
   actionButton: {
     flexDirection: "row",
@@ -364,81 +227,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 6,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: 24,
-    borderRadius: 16,
-    width: "85%",
-    maxHeight: "80%",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#000",
-  },
-  modalInput: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 12,
-    color: "#000",
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 8,
-    marginBottom: 8,
-    color: "#000",
-  },
-  gradeItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  gradeText: {
-    fontSize: 14,
-    color: "#333",
-  },
-  addGradeContainer: {
-    flexDirection: "row",
-    gap: 8,
-    alignItems: "center",
-    marginBottom: 16,
-  },
-  addGradeButton: {
-    backgroundColor: "#007AFF",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalButtonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  modalButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  modalButtonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#fff",
   },
 });

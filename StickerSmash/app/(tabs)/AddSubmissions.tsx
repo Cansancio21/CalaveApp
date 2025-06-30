@@ -47,14 +47,14 @@ export default function AddSubmissionScreen() {
     } else if (!/^[A-Z]/.test(subject)) {
       setSubjectError("Subject must start with a capital letter.");
       hasError = true;
-    } else if (/\d/.test(subject)) {
-      setSubjectError("Subject must not contain numbers.");
-      hasError = true;
     }
 
     // === College Grade Validation ===
     if (!collegeGrade) {
       setCollegeGradeError("College grade is required.");
+      hasError = true;
+    } else if (isNaN(parseFloat(collegeGrade)) || parseFloat(collegeGrade) < 1.0 || parseFloat(collegeGrade) > 5.0) {
+      setCollegeGradeError("Grade must be between 1.0 and 5.0.");
       hasError = true;
     }
 
@@ -66,7 +66,7 @@ export default function AddSubmissionScreen() {
 
     if (submissions.length > 0 && !exists) {
       Alert.alert(
-        "Students Not Found",
+        "Student Not Found",
         "This student does not exist in submissions. Please enter the exact name as registered."
       );
       return;

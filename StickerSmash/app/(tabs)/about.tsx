@@ -24,7 +24,7 @@ export default function AboutScreen() {
       </View>
 
       {/* Footer */}
-      <Text style={styles.footer}>Focus on what matters</Text>
+      <Text style={styles.footer}>No copyrights Ryan Cansancio / John William Mayormita</Text>
     </View>
   );
 }

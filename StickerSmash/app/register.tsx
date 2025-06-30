@@ -77,7 +77,7 @@ export default function Register() {
       await AsyncStorage.setItem("authToken", username);
       
       Alert.alert("Success", "Account created successfully!", [
-        { text: "Continue", onPress: () => router.push("/(tabs)") }
+        { text: "Continue", onPress: () => router.push("/login") } // Redirect to login page
       ]);
     } catch (error) {
       Alert.alert("Error", "Registration failed. Please try again.");
@@ -329,19 +329,19 @@ const styles = StyleSheet.create({
   },
   registerButtonText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#000',
-    letterSpacing: 0.5,
   },
   loginPrompt: {
     alignSelf: 'center',
+    marginTop: 16,
   },
   loginText: {
-    color: '#555',
     fontSize: 14,
+    color: '#000',
   },
   loginLink: {
     color: '#FFD700',
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
 });
